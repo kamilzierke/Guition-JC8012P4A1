@@ -149,6 +149,8 @@ light:
         - script.execute: wake_display
     on_turn_off:
       then:
+        - lambda: |-
+            id(screen_sleep_secs_left) = 0;
         - switch.turn_on: switch_antiburn
         - lvgl.pause:
             show_snow: true
@@ -718,12 +720,15 @@ script:
   - id: arm_display_sleep
     mode: restart
     then:
+      - lambda: |-
+          id(screen_sleep_secs_left) = id(screen_sleep_secs_cfg);
       - delay: !lambda "return (uint32_t)id(screen_sleep_secs_cfg) * 1000;"
       - script.execute: sleep_display
 
   - id: wake_display
     mode: restart
     then:
+      - script.execute: arm_display_sleep
       - lambda: |-
           id(screen_sleep_secs_left) = id(screen_sleep_secs_cfg);
       - switch.turn_off: switch_antiburn
@@ -733,7 +738,16 @@ script:
           then:
             - lvgl.resume:
             - lvgl.widget.redraw:
-      - script.execute: arm_display_sleep
+
+  - id: sleep_display
+    mode: restart
+    then:
+      - lambda: |-
+          id(screen_sleep_secs_left) = 0;
+      - switch.turn_on: switch_antiburn
+      - lvgl.pause:
+          show_snow: true
+      - light.turn_off: backlight
 
   - id: sleep_display
     mode: restart
