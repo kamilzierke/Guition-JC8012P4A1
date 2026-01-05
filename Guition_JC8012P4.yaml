@@ -818,15 +818,11 @@ script:
     then:
       - lambda: |-
           id(screen_sleep_secs_left) = id(screen_sleep_secs_cfg);
-      - delay: !lambda "return (uint32_t)id(screen_sleep_secs_cfg) * 1000;"
-      - script.execute: sleep_display
 
   - id: wake_display
     mode: restart
     then:
       - script.execute: arm_display_sleep
-      - lambda: |-
-          id(screen_sleep_secs_left) = id(screen_sleep_secs_cfg);
       - switch.turn_off: switch_antiburn
       - light.turn_on: backlight
       - if:
@@ -835,7 +831,7 @@ script:
             - lvgl.resume:
             - lvgl.widget.redraw:
 
-  - id: sleep_display
+  - id: screen_sleep_display
     mode: restart
     then:
       - lambda: |-
@@ -843,14 +839,6 @@ script:
       - switch.turn_on: switch_antiburn
       - lvgl.pause:
           show_snow: true
-      - light.turn_off: backlight
-
-  - id: sleep_display
-    mode: restart
-    then:
-      - lambda: |-
-          id(screen_sleep_secs_left) = 0;
-      - switch.turn_on: switch_antiburn
       - light.turn_off: backlight
 
   - id: show_api_modal
@@ -1072,6 +1060,7 @@ lvgl:
                       width: 120
                       height: 44
                       on_click:
+                        - script.execute: wake_display
                         - script.execute: hide_battery_modal
                       widgets:
                         - label:
@@ -1138,6 +1127,7 @@ lvgl:
                       width: 120
                       height: 44
                       on_click:
+                        - script.execute: wake_display
                         - script.execute: hide_api_modal
                       widgets:
                         - label:
@@ -1481,7 +1471,7 @@ interval:
           if (id(screen_sleep_secs_left) > 0) {
             id(screen_sleep_secs_left)--;
             if (id(screen_sleep_secs_left) == 0) {
-              id(sleep_display).execute();
+              id(screen_sleep_display).execute();
             }
           }
       - lvgl.label.update:
