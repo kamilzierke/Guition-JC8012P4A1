@@ -1,3 +1,99 @@
+# ==================================================================================================
+# Guition JC8012P4 (10.1") – PODSUMOWANIE SPRZĘTU + PINOUT (na podstawie TEJ konfiguracji YAML)
+# ==================================================================================================
+#
+# UWAGA O ROZDZIELCZOŚCI:
+# - W pliku występuje "12800x800" / "12800x800" w friendly_name/comment, ale realnie w konfiguracji
+#   i w driverze MIPI-DSI ustawiasz: width=800, height=1280 (czyli 800x1280, portrait).
+#
+# PLATFORM / MCU:
+# - SoC główny: ESP32-P4 (board: esp32-p4-evboard), CPU: 400MHz, framework: ESP-IDF
+# - Flash: 16MB
+# - PSRAM: włączona, 200MHz
+# - LDO: esp_ldo channel 3 @ 2.5V (zasilanie MIPI DSI – VDDSDIO 2.5V)
+#
+# ŁĄCZNOŚĆ:
+# - Sieć (Wi-Fi 6 / BLE): ESP32-C6 jako coprocessor po SDIO (esp32_hosted variant: ESP32C6)
+# - Tryb AP fallback: włączony (captive portal + web_server)
+#
+# WYŚWIETLACZ / UI:
+# - Panel: 10.1" 800x1280, sterowanie: mipi_dsi (external component: willumpie82/esphome@dev)
+# - LVGL: planowane (sekcja zakomentowana)
+#
+# DOTYK:
+# - Kontroler: gsl3680 (external component: kvj/esphome@jd9365_gsl3680)
+# - I2C skan: włączony, 400kHz
+# - Wykryte adresy I2C (zdefiniowane w i2c_device): 0x18, 0x32, 0x36, 0x40
+#
+# AUDIO:
+# - DAC/codec: ES8311 (sekcja zakomentowana)
+# - I2S: zadeklarowane piny (sekcja zakomentowana)
+#
+# POMIARY BATERII:
+# - ADC Battery voltage: GPIO52, attenuation 12dB, *1.68 (dzielnik/skalowanie)
+# - Dodatkowa logika: OCV→SOC, estymacje %/h i czasu pracy (software)
+#
+# DEBUG/DIAGNOSTYKA:
+# - logger: USB Serial/JTAG, level=debug
+# - debug sensor: heap/psram/cpu/loop_time itd.
+#
+# ==================================================================================================
+# PINOUT – MAPA FUNKCJI ↔ GPIO (WEDŁUG TEGO YAML)
+# ==================================================================================================
+#
+# A) ESP32-C6 “HOSTED” (SDIO) – esp32_hosted:
+# - GPIO54 : C6_RESET
+# - GPIO19 : SDIO_CMD
+# - GPIO18 : SDIO_CLK
+# - GPIO14 : SDIO_D0
+# - GPIO15 : SDIO_D1
+# - GPIO16 : SDIO_D2
+# - GPIO17 : SDIO_D3
+#
+# B) Podświetlenie LCD (PWM):
+# - GPIO23 : LCD_BACKLIGHT_PWM (LEDC channel 0, 1kHz) → light: monochromatic "Backlight"
+#
+# C) I2C (Touch / peryferia na bus_a):
+# - GPIO7  : I2C_SDA (bus_a)
+# - GPIO8  : I2C_SCL (bus_a)
+# - Adresy (zdefiniowane): 0x18 / 0x32 / 0x36 / 0x40
+#
+# D) Touchscreen GSL3680 (sekcja zakomentowana, ale piny zadeklarowane):
+# - GPIO22 : TOUCH_RESET
+# - GPIO21 : TOUCH_INT
+#
+# E) Display MIPI-DSI (sekcja zakomentowana, ale pin zadeklarowany):
+# - GPIO27 : DISPLAY_RESET
+# - MIPI-DSI lane/pins: N/D (linie MIPI nie są mapowane jako klasyczne GPIO w YAML)
+#
+# F) Audio / I2S (sekcje zakomentowane, ale piny zadeklarowane):
+# - GPIO10 : I2S_LRCLK
+# - GPIO12 : I2S_BCLK
+# - GPIO13 : I2S_MCLK
+# - GPIO9  : I2S_DOUT (speaker)
+# - GPIO11 : I2S_DIN  (microphone)
+#
+# G) ADC – pomiar napięcia baterii:
+# - GPIO52 : ADC_BATT_V
+#
+# ==================================================================================================
+# KONFLIKTY / RYZYKA KONFIGURACYJNE (wynikające z tej mapy)
+# ==================================================================================================
+#
+# 1) GPIO52 jest użyty jako ADC_BATT_V.
+#    Jeśli na tej platformie GPIO52 jest jednocześnie MDIO Ethernet PHY (częsty przypadek w P4 EVB),
+#    to będzie konflikt funkcji (ADC vs MDIO). W tym YAML nie masz ethernet:, ale sprzęt może mieć PHY.
+#
+# 2) Touch/Display/Audio są obecnie zakomentowane – ich piny nie są aktywne w runtime, ale są częścią
+#    planowanego pinoutu.
+#
+# ==================================================================================================
+# ZALEŻNOŚCI / KOMPONENTY ZEWNĘTRZNE (ważne dla kompilacji)
+# ==================================================================================================
+# - mipi_dsi: github://willumpie82/esphome@dev  (components: mipi_dsi)
+# - gsl3680:  github://kvj/esphome@jd9365_gsl3680 (components: gsl3680, refresh: 0s)
+# ==================================================================================================
+
 
 
 substitutions:
@@ -722,11 +818,15 @@ script:
     then:
       - lambda: |-
           id(screen_sleep_secs_left) = id(screen_sleep_secs_cfg);
+      - delay: !lambda "return (uint32_t)id(screen_sleep_secs_cfg) * 1000;"
+      - script.execute: sleep_display
 
   - id: wake_display
     mode: restart
     then:
       - script.execute: arm_display_sleep
+      - lambda: |-
+          id(screen_sleep_secs_left) = id(screen_sleep_secs_cfg);
       - switch.turn_off: switch_antiburn
       - light.turn_on: backlight
       - if:
@@ -735,7 +835,7 @@ script:
             - lvgl.resume:
             - lvgl.widget.redraw:
 
-  - id: screen_sleep_display
+  - id: sleep_display
     mode: restart
     then:
       - lambda: |-
@@ -743,6 +843,14 @@ script:
       - switch.turn_on: switch_antiburn
       - lvgl.pause:
           show_snow: true
+      - light.turn_off: backlight
+
+  - id: sleep_display
+    mode: restart
+    then:
+      - lambda: |-
+          id(screen_sleep_secs_left) = 0;
+      - switch.turn_on: switch_antiburn
       - light.turn_off: backlight
 
   - id: show_api_modal
@@ -1373,7 +1481,7 @@ interval:
           if (id(screen_sleep_secs_left) > 0) {
             id(screen_sleep_secs_left)--;
             if (id(screen_sleep_secs_left) == 0) {
-              id(screen_sleep_display).execute();
+              id(sleep_display).execute();
             }
           }
       - lvgl.label.update:
