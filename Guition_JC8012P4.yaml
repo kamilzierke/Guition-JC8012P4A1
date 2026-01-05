@@ -147,6 +147,13 @@ light:
     on_turn_on:
       then:
         - script.execute: wake_display
+    on_turn_off:
+      then:
+        - lambda: |-
+            id(screen_sleep_secs_left) = 0;
+        - switch.turn_on: switch_antiburn
+        - lvgl.pause:
+            show_snow: true
 
 # -------------------------------------------
 # Touchscreen
@@ -299,6 +306,15 @@ sensor:
       - lambda: return min(max(2 * (x + 100.0), 0.0), 100.0);
     unit_of_measurement: "%"
     entity_category: "diagnostic"
+
+  - platform: template
+    id: screen_sleep_left_sensor
+    name: "Ekran: pozostały czas [s]"
+    unit_of_measurement: "s"
+    accuracy_decimals: 0
+    update_interval: 1s
+    lambda: |-
+      return id(screen_sleep_secs_left);
 
   - platform: adc
     id: batt_v
@@ -606,6 +622,11 @@ globals:
     restore_value: yes
     initial_value: '60'
 
+  - id: screen_sleep_secs_left
+    type: int
+    restore_value: no
+    initial_value: '60'
+
   - id: last_ha_connection
     type: int32_t
     restore_value: no
@@ -675,12 +696,7 @@ touchscreen:
     on_touch:
       - script.execute: wake_display
     on_release:
-      - if:
-          condition: lvgl.is_paused
-          then:
-            - lvgl.resume:
-            - lvgl.widget.redraw:
-            - light.turn_on: backlight
+      - script.execute: wake_display
 
 # --- Display (MIPI DSI) ---
 display:
@@ -704,21 +720,30 @@ script:
   - id: arm_display_sleep
     mode: restart
     then:
-      - delay: !lambda "return (uint32_t)id(screen_sleep_secs_cfg) * 1000;"
-      - light.turn_off: backlight
-      - lvgl.pause:
-          show_snow: true
+      - lambda: |-
+          id(screen_sleep_secs_left) = id(screen_sleep_secs_cfg);
 
   - id: wake_display
     mode: restart
     then:
+      - script.execute: arm_display_sleep
+      - switch.turn_off: switch_antiburn
       - light.turn_on: backlight
       - if:
           condition: lvgl.is_paused
           then:
             - lvgl.resume:
             - lvgl.widget.redraw:
-      - script.execute: arm_display_sleep
+
+  - id: screen_sleep_display
+    mode: restart
+    then:
+      - lambda: |-
+          id(screen_sleep_secs_left) = 0;
+      - switch.turn_on: switch_antiburn
+      - lvgl.pause:
+          show_snow: true
+      - light.turn_off: backlight
 
   - id: show_api_modal
     mode: restart
@@ -1344,6 +1369,13 @@ switch:
 interval:
   - interval: 1s
     then:
+      - lambda: |-
+          if (id(screen_sleep_secs_left) > 0) {
+            id(screen_sleep_secs_left)--;
+            if (id(screen_sleep_secs_left) == 0) {
+              id(screen_sleep_display).execute();
+            }
+          }
       - lvgl.label.update:
           id: time_label
           text: !lambda |-
