@@ -686,6 +686,15 @@ font:
     size: 10
 
   - file: "fonts/materialdesignicons-webfont.ttf"
+    id: icons_16
+    size: 16
+    bpp: 4
+    glyphs: [
+      "\U000F0091",
+      "\U000F05A9",
+    ]
+
+  - file: "fonts/materialdesignicons-webfont.ttf"
     id: icons_20
     size: 20
     bpp: 4
@@ -929,6 +938,14 @@ lvgl:
       radius: 8
       pad_all: 12
       text_color: 0xFFFFFF
+    - id: footer_button
+      bg_color: 0x1A1A1A
+      bg_opa: COVER
+      border_color: 0x2A2A2A
+      border_width: 1
+      radius: 6
+      pad_all: 4
+      text_color: 0xFFFFFF
     - id: tile_style
       bg_color: 0x0B0B0B
       bg_opa: COVER
@@ -971,13 +988,13 @@ lvgl:
       - obj:
           align: TOP_MID
           width: 100%
-          height: 40
+          height: 44
           styles: bar_style
 
       - obj:
           align: BOTTOM_MID
           width: 100%
-          height: 30
+          height: 44
           styles: bar_style
 
       # WiFi dBm
@@ -985,7 +1002,7 @@ lvgl:
           id: lbl_wifi_dbm
           align: TOP_RIGHT
           x: -270
-          y: 10
+          y: 12
           text_font: montserrat_12
           text: "-- dBm"
           styles: top_layer_style
@@ -995,7 +1012,7 @@ lvgl:
           id: lbl_wifi_percent
           align: TOP_RIGHT
           x: -205
-          y: 10
+          y: 12
           text_font: montserrat_12
           text: "-- %"
           styles: top_layer_style
@@ -1004,9 +1021,9 @@ lvgl:
       - obj:
           align: TOP_RIGHT
           x: -150
-          y: 6
+          y: 7
           width: 44
-          height: 34
+          height: 30
           bg_opa: TRANSP
           border_width: 0
           clickable: true
@@ -1019,7 +1036,7 @@ lvgl:
                 text: "\U000F05A9"
                 hidden: true
                 align: CENTER
-                text_font: icons_20
+                text_font: icons_16
                 styles: top_layer_style
 
       # Battery % label
@@ -1027,7 +1044,7 @@ lvgl:
           id: lbl_battery_percent
           align: TOP_RIGHT
           x: -85
-          y: 10
+          y: 12
           text_font: montserrat_12
           text: "-- %"
           styles: top_layer_style
@@ -1036,9 +1053,9 @@ lvgl:
       - obj:
           align: TOP_RIGHT
           x: -10
-          y: 6
+          y: 7
           width: 44
-          height: 34
+          height: 30
           bg_opa: TRANSP
           border_width: 0
           clickable: true
@@ -1049,7 +1066,7 @@ lvgl:
             - label:
                 id: lbl_battery_status
                 align: CENTER
-                text_font: icons_20
+                text_font: icons_16
                 text: "\U000F0091"
                 styles: top_layer_style
 
@@ -1194,7 +1211,7 @@ lvgl:
           id: lbl_battery_v
           align: TOP_RIGHT
           x: -120
-          y: 10
+          y: 12
           text_font: montserrat_12
           text: "--.-- V"
           styles: top_layer_style
@@ -1204,10 +1221,55 @@ lvgl:
           id: lbl_ip_top
           align: TOP_LEFT
           x: 10
-          y: 10
+          y: 12
           text_font: montserrat_12
           text: "IP: --"
           styles: top_layer_style
+
+      # Footer page navigation
+      - obj:
+          align: BOTTOM_LEFT
+          x: 10
+          y: -6
+          width: 44
+          height: 32
+          styles: footer_button
+          clickable: true
+          on_click:
+            - script.execute: wake_display
+            - script.execute: switch_to_main_page
+          widgets:
+            - label:
+                text: "\U000F0141"
+                align: CENTER
+                text_font: icons_20
+                styles: top_layer_style
+
+      - label:
+          id: lbl_page_indicator
+          align: BOTTOM_MID
+          y: -12
+          text_font: montserrat_12
+          text: "1/1"
+          styles: top_layer_style
+
+      - obj:
+          align: BOTTOM_RIGHT
+          x: -10
+          y: -6
+          width: 44
+          height: 32
+          styles: footer_button
+          clickable: true
+          on_click:
+            - script.execute: wake_display
+            - script.execute: switch_to_main_page
+          widgets:
+            - label:
+                text: "\U000F0142"
+                align: CENTER
+                text_font: icons_20
+                styles: top_layer_style
 
   
   
