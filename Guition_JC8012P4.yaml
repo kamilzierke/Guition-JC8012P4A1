@@ -361,6 +361,17 @@ text_sensor:
             }
             return x.c_str();
 
+  - platform: homeassistant
+    id: ha_weather_state
+    entity_id: weather.forecast_home
+    on_value:
+      - lvgl.label.update:
+          id: lbl_weather_state
+          text: !lambda |-
+            if (x.empty()) {
+              return "-";
+            }
+            return x.c_str();
 
 
 
@@ -532,10 +543,10 @@ sensor:
     accuracy_decimals: 3
     update_interval: never
 
-  # --- HA: Na zewnątrz (temp) ---
+  # --- HA: Na zewnątrz (temp, taras) ---
   - platform: homeassistant
     id: ha_outside_temp
-    entity_id: sensor.esphome_web_68ca18_outside_temp
+    entity_id: sensor.termometr_parter_taras_na_zewnatrz_temperature
     on_value:
       - lvgl.label.update:
           id: lbl_outside_temp
@@ -543,6 +554,39 @@ sensor:
             static char s[24];
             if (isnan(x)) snprintf(s, sizeof(s), "-.-°C");
             else snprintf(s, sizeof(s), "%.1f°C", x);
+            return s;
+      - lvgl.label.update:
+          id: lbl_floor_taras_temp
+          text: !lambda |-
+            static char s[24];
+            if (isnan(x)) snprintf(s, sizeof(s), "-.-°C");
+            else snprintf(s, sizeof(s), "%.1f°C", x);
+            return s;
+
+  # --- HA: Na zewnątrz (temp, elewacja) ---
+  - platform: homeassistant
+    id: ha_outside_temp_floor
+    entity_id: sensor.esphome_web_68ca18_outside_temp
+    on_value:
+      - lvgl.label.update:
+          id: lbl_floor_outside_temp
+          text: !lambda |-
+            static char s[24];
+            if (isnan(x)) snprintf(s, sizeof(s), "-.-°C");
+            else snprintf(s, sizeof(s), "%.1f°C", x);
+            return s;
+
+  # --- HA: Na zewnątrz (wilgotność) ---
+  - platform: homeassistant
+    id: ha_outside_humidity
+    entity_id: sensor.termometr_parter_taras_na_zewnatrz_humidity
+    on_value:
+      - lvgl.label.update:
+          id: lbl_outside_humidity
+          text: !lambda |-
+            static char s[24];
+            if (isnan(x)) snprintf(s, sizeof(s), "-- %%");
+            else snprintf(s, sizeof(s), "%.1f %%", x);
             return s;
 
   # --- HA: Średnia temp w domu ---
@@ -570,6 +614,26 @@ sensor:
             if (isnan(x)) snprintf(s, sizeof(s), "-.-°C");
             else snprintf(s, sizeof(s), "%.1f°C", x);
             return s;
+      - lvgl.label.update:
+          id: lbl_floor_salon_temp
+          text: !lambda |-
+            static char s[24];
+            if (isnan(x)) snprintf(s, sizeof(s), "-.-°C");
+            else snprintf(s, sizeof(s), "%.1f°C", x);
+            return s;
+
+  # --- HA: Salon (wilgotność) ---
+  - platform: homeassistant
+    id: ha_salon_humidity
+    entity_id: sensor.termometr_parter_salon_kanapa_humidity
+    on_value:
+      - lvgl.label.update:
+          id: lbl_salon_humidity
+          text: !lambda |-
+            static char s[24];
+            if (isnan(x)) snprintf(s, sizeof(s), "-- %%");
+            else snprintf(s, sizeof(s), "%.1f %%", x);
+            return s;
 
   # --- HA: Sypialnia (mały pokój) ---
   - platform: homeassistant
@@ -583,6 +647,39 @@ sensor:
             if (isnan(x)) snprintf(s, sizeof(s), "-.-°C");
             else snprintf(s, sizeof(s), "%.1f°C", x);
             return s;
+      - lvgl.label.update:
+          id: lbl_floor_sypialnia_temp
+          text: !lambda |-
+            static char s[24];
+            if (isnan(x)) snprintf(s, sizeof(s), "-.-°C");
+            else snprintf(s, sizeof(s), "%.1f°C", x);
+            return s;
+
+  # --- HA: Sypialnia (wilgotność) ---
+  - platform: homeassistant
+    id: ha_sypialnia_humidity
+    entity_id: sensor.termometr_parter_maly_pokoj_humidity
+    on_value:
+      - lvgl.label.update:
+          id: lbl_sypialnia_humidity
+          text: !lambda |-
+            static char s[24];
+            if (isnan(x)) snprintf(s, sizeof(s), "-- %%");
+            else snprintf(s, sizeof(s), "%.1f %%", x);
+            return s;
+
+  # --- HA: Sypialnia (ciśnienie) ---
+  - platform: homeassistant
+    id: ha_sypialnia_pressure
+    entity_id: sensor.termometr_parter_maly_pokoj_pressure
+    on_value:
+      - lvgl.label.update:
+          id: lbl_sypialnia_pressure
+          text: !lambda |-
+            static char s[24];
+            if (isnan(x)) snprintf(s, sizeof(s), "---- hPa");
+            else snprintf(s, sizeof(s), "%.0f hPa", x);
+            return s;
 
   # --- HA: Łazienka ---
   - platform: homeassistant
@@ -590,11 +687,63 @@ sensor:
     entity_id: sensor.termometr_parter_lazienka_temperature
     on_value:
       - lvgl.label.update:
-          id: lbl_lazienka_temp
+          id: lbl_floor_lazienka_temp
           text: !lambda |-
             static char s[24];
             if (isnan(x)) snprintf(s, sizeof(s), "-.-°C");
             else snprintf(s, sizeof(s), "%.1f°C", x);
+            return s;
+
+  # --- HA: Kuchnia (regal) ---
+  - platform: homeassistant
+    id: ha_kuchnia_regal_temp
+    entity_id: sensor.termometr_parter_kuchnia_regal_temperature
+    on_value:
+      - lvgl.label.update:
+          id: lbl_floor_kuchnia_temp
+          text: !lambda |-
+            static char s[24];
+            if (isnan(x)) snprintf(s, sizeof(s), "-.-°C");
+            else snprintf(s, sizeof(s), "%.1f°C", x);
+            return s;
+
+  # --- HA: Weranda ---
+  - platform: homeassistant
+    id: ha_weranda_temp
+    entity_id: sensor.termometr_parter_weranda_temperature
+    on_value:
+      - lvgl.label.update:
+          id: lbl_floor_weranda_temp
+          text: !lambda |-
+            static char s[24];
+            if (isnan(x)) snprintf(s, sizeof(s), "-.-°C");
+            else snprintf(s, sizeof(s), "%.1f°C", x);
+            return s;
+
+  # --- HA: Salon BT (temp) ---
+  - platform: homeassistant
+    id: ha_salon_bt_temp
+    entity_id: sensor.ble_temperature_a4c1383dd8d5
+    on_value:
+      - lvgl.label.update:
+          id: lbl_salon_bt_temp
+          text: !lambda |-
+            static char s[24];
+            if (isnan(x)) snprintf(s, sizeof(s), "-.-°C");
+            else snprintf(s, sizeof(s), "%.1f°C", x);
+            return s;
+
+  # --- HA: Salon BT (wilgotność) ---
+  - platform: homeassistant
+    id: ha_salon_bt_humidity
+    entity_id: sensor.ble_humidity_a4c1383dd8d5
+    on_value:
+      - lvgl.label.update:
+          id: lbl_salon_bt_humidity
+          text: !lambda |-
+            static char s[24];
+            if (isnan(x)) snprintf(s, sizeof(s), "-- %%");
+            else snprintf(s, sizeof(s), "%.1f %%", x);
             return s;
 binary_sensor:
   - platform: template
@@ -629,10 +778,59 @@ binary_sensor:
     entity_id: binary_sensor.drzwi_parter_przedpokoj_drzwi_wejsciowe_contact
     on_state:
       - lvgl.label.update:
-          id: lbl_drzwi_wejsciowe
+          id: lbl_floor_drzwi_wejsciowe
           text: !lambda |-
-            return x ? std::string("OTWARTE") : std::string("ZAMKNIETE");
+            return x ? std::string("●") : std::string("○");
+          text_color: !lambda |-
+            return x ? lv_color_hex(0xFF5A5A) : lv_color_hex(0x55FF55);
 
+  # --- HA: Drzwi weranda ---
+  - platform: homeassistant
+    id: ha_drzwi_weranda
+    entity_id: binary_sensor.drzwi_parter_salon_drzwi_na_werande_contact
+    on_state:
+      - lvgl.label.update:
+          id: lbl_floor_drzwi_weranda
+          text: !lambda |-
+            return x ? std::string("●") : std::string("○");
+          text_color: !lambda |-
+            return x ? lv_color_hex(0xFF5A5A) : lv_color_hex(0x55FF55);
+
+  # --- HA: Drzwi HST ---
+  - platform: homeassistant
+    id: ha_drzwi_hst
+    entity_id: binary_sensor.parter_salon_drzwi_hst_contact
+    on_state:
+      - lvgl.label.update:
+          id: lbl_floor_drzwi_hst
+          text: !lambda |-
+            return x ? std::string("●") : std::string("○");
+          text_color: !lambda |-
+            return x ? lv_color_hex(0xFF5A5A) : lv_color_hex(0x55FF55);
+
+  # --- HA: Drzwi mały pokój ---
+  - platform: homeassistant
+    id: ha_drzwi_maly_pokoj
+    entity_id: binary_sensor.drzwi_parter_maly_pokoj_drzwi_balkonowe_contact
+    on_state:
+      - lvgl.label.update:
+          id: lbl_floor_drzwi_maly_pokoj
+          text: !lambda |-
+            return x ? std::string("●") : std::string("○");
+          text_color: !lambda |-
+            return x ? lv_color_hex(0xFF5A5A) : lv_color_hex(0x55FF55);
+
+  # --- HA: Drzwi garaż ---
+  - platform: homeassistant
+    id: ha_drzwi_garaz
+    entity_id: binary_sensor.drzwi_parter_kotlownia_drzwi_garazowe_contact
+    on_state:
+      - lvgl.label.update:
+          id: lbl_floor_drzwi_garaz
+          text: !lambda |-
+            return x ? std::string("●") : std::string("○");
+          text_color: !lambda |-
+            return x ? lv_color_hex(0xFF5A5A) : lv_color_hex(0x55FF55);
 
   # --- HA: Okno kuchnia 1 ---
   - platform: homeassistant
@@ -640,9 +838,35 @@ binary_sensor:
     entity_id: binary_sensor.parter_kuchnia_okno_1_contact
     on_state:
       - lvgl.label.update:
-          id: lbl_okno_kuchnia_1
+          id: lbl_floor_okno_kuchnia_1
           text: !lambda |-
-            return x ? std::string("OTWARTE") : std::string("ZAMKNIETE");
+            return x ? std::string("●") : std::string("○");
+          text_color: !lambda |-
+            return x ? lv_color_hex(0xFF5A5A) : lv_color_hex(0x55FF55);
+
+  # --- HA: Okno kuchnia 2 ---
+  - platform: homeassistant
+    id: ha_okno_kuchnia_2
+    entity_id: binary_sensor.parter_kuchnia_okno_2_contact
+    on_state:
+      - lvgl.label.update:
+          id: lbl_floor_okno_kuchnia_2
+          text: !lambda |-
+            return x ? std::string("●") : std::string("○");
+          text_color: !lambda |-
+            return x ? lv_color_hex(0xFF5A5A) : lv_color_hex(0x55FF55);
+
+  # --- HA: Okno kuchnia 3 ---
+  - platform: homeassistant
+    id: ha_okno_kuchnia_3
+    entity_id: binary_sensor.parter_kuchnia_okno_3_contact
+    on_state:
+      - lvgl.label.update:
+          id: lbl_floor_okno_kuchnia_3
+          text: !lambda |-
+            return x ? std::string("●") : std::string("○");
+          text_color: !lambda |-
+            return x ? lv_color_hex(0xFF5A5A) : lv_color_hex(0x55FF55);
 
 ########################################################
 # FONTS / ICONS
@@ -872,6 +1096,17 @@ script:
     then:
       - lvgl.widget.hide: modal_battery_bg
 
+  - id: show_backlight_modal
+    mode: restart
+    then:
+      - lvgl.widget.show: modal_backlight_bg
+      - lvgl.widget.redraw: modal_backlight_bg
+
+  - id: hide_backlight_modal
+    mode: restart
+    then:
+      - lvgl.widget.hide: modal_backlight_bg
+
   - id: switch_to_main_page
     mode: restart
     then:
@@ -1017,6 +1252,27 @@ lvgl:
           text: "-- %"
           styles: top_layer_style
 
+      # Backlight % (click -> modal)
+      - obj:
+          align: TOP_LEFT
+          x: 170
+          y: 6
+          width: 80
+          height: 30
+          bg_opa: TRANSP
+          border_width: 0
+          clickable: true
+          on_click:
+            - script.execute: wake_display
+            - script.execute: show_backlight_modal
+          widgets:
+            - label:
+                id: lbl_backlight_percent
+                align: CENTER
+                text_font: montserrat_12
+                text: "-- %"
+                styles: top_layer_style
+
       # HA icon click -> API modal
       - obj:
           align: TOP_RIGHT
@@ -1134,6 +1390,74 @@ lvgl:
                       on_click:
                         - script.execute: wake_display
                         - script.execute: hide_battery_modal
+                      widgets:
+                        - label:
+                            text: "Close"
+                            align: CENTER
+
+      # Backlight modal
+      - obj:
+          id: modal_backlight_bg
+          hidden: true
+          align: CENTER
+          width: 520
+          height: 320
+          bg_color: 0x000000
+          bg_opa: TRANSP
+          widgets:
+            - obj:
+                align: CENTER
+                width: 480
+                height: 290
+                styles: panel_style
+                widgets:
+                  - label:
+                      text: "Backlight"
+                      align: TOP_MID
+                      y: 6
+                      text_font: montserrat_24
+
+                  - label:
+                      id: lbl_backlight_modal_percent
+                      text: "Brightness: -- %"
+                      align: TOP_MID
+                      y: 50
+                      text_font: montserrat_16
+
+                  - slider:
+                      id: backlight_slider
+                      x: 20
+                      y: 110
+                      width: 440
+                      height: 40
+                      min_value: 5
+                      max_value: 100
+                      value: 100
+                      on_value:
+                        then:
+                          - script.execute: wake_display
+                          - light.turn_on:
+                              id: backlight
+                              brightness: !lambda return x / 100.0;
+                          - lvgl.label.update:
+                              id: lbl_backlight_modal_percent
+                              text: !lambda |-
+                                static char s[32];
+                                int b = (int)x;
+                                if (b < 0) b = 0;
+                                if (b > 100) b = 100;
+                                snprintf(s, sizeof(s), "Brightness: %d %%", b);
+                                return s;
+
+                  - button:
+                      align: BOTTOM_MID
+                      y: -12
+                      width: 140
+                      height: 44
+                      styles: accent_button
+                      on_click:
+                        - script.execute: wake_display
+                        - script.execute: hide_backlight_modal
                       widgets:
                         - label:
                             text: "Close"
@@ -1295,7 +1619,7 @@ lvgl:
             text_font: montserrat_16
             text_color: 0xCCCCCC
 
-        # KAFLE: kontener grid (2 kolumny, 6 rzędów)
+        # KAFLE: kontener grid (2 kolumny, 4 rzędy)
         - obj:
             id: dashboard_grid
             x: 20
@@ -1307,90 +1631,161 @@ lvgl:
             layout:
               type: grid
               grid_columns: [FR(1), FR(1)]
-              grid_rows:    [FR(1), FR(1), FR(1), FR(1), FR(1), FR(1)]
+              grid_rows:    [FR(3), FR(2), FR(2), FR(2)]
               pad_row: 10
               pad_column: 10
 
             widgets:
 
-              # (0,0) POGODA
+              # (0,0) PLAN PAR TERU (picture-elements)
+              - obj:
+                  styles: tile_style
+                  grid_cell_column_pos: 0
+                  grid_cell_column_span: 2
+                  grid_cell_row_pos: 0
+                  grid_cell_row_span: 1
+                  widgets:
+                    - label:
+                        styles: tile_title
+                        text: "PLAN PARTERU"
+                        align: TOP_LEFT
+                    - label:
+                        id: lbl_floor_kuchnia_temp
+                        x: 230
+                        y: 50
+                        text: "-.-°C"
+                        text_font: montserrat_14
+                        text_color: 0xFFFFFF
+                    - label:
+                        id: lbl_floor_okno_kuchnia_3
+                        x: 165
+                        y: 10
+                        text: "○"
+                        text_font: montserrat_16
+                        text_color: 0x55FF55
+                    - label:
+                        id: lbl_floor_okno_kuchnia_2
+                        x: 220
+                        y: 10
+                        text: "○"
+                        text_font: montserrat_16
+                        text_color: 0x55FF55
+                    - label:
+                        id: lbl_floor_okno_kuchnia_1
+                        x: 250
+                        y: 10
+                        text: "○"
+                        text_font: montserrat_16
+                        text_color: 0x55FF55
+                    - label:
+                        id: lbl_floor_drzwi_wejsciowe
+                        x: 410
+                        y: 10
+                        text: "○"
+                        text_font: montserrat_16
+                        text_color: 0x55FF55
+                    - label:
+                        id: lbl_floor_drzwi_weranda
+                        x: 165
+                        y: 115
+                        text: "○"
+                        text_font: montserrat_16
+                        text_color: 0x55FF55
+                    - label:
+                        id: lbl_floor_drzwi_hst
+                        x: 300
+                        y: 200
+                        text: "○"
+                        text_font: montserrat_16
+                        text_color: 0x55FF55
+                    - label:
+                        id: lbl_floor_drzwi_maly_pokoj
+                        x: 440
+                        y: 185
+                        text: "○"
+                        text_font: montserrat_16
+                        text_color: 0x55FF55
+                    - label:
+                        id: lbl_floor_drzwi_garaz
+                        x: 540
+                        y: 30
+                        text: "○"
+                        text_font: montserrat_16
+                        text_color: 0x55FF55
+                    - label:
+                        id: lbl_floor_salon_temp
+                        x: 270
+                        y: 150
+                        text: "-.-°C"
+                        text_font: montserrat_14
+                        text_color: 0xFFFFFF
+                    - label:
+                        id: lbl_floor_weranda_temp
+                        x: 75
+                        y: 145
+                        text: "-.-°C"
+                        text_font: montserrat_14
+                        text_color: 0xFFFFFF
+                    - label:
+                        id: lbl_floor_taras_temp
+                        x: 290
+                        y: 275
+                        text: "-.-°C"
+                        text_font: montserrat_14
+                        text_color: 0xFFFFFF
+                    - label:
+                        id: lbl_floor_outside_temp
+                        x: 610
+                        y: 10
+                        text: "-.-°C"
+                        text_font: montserrat_14
+                        text_color: 0xFFFFFF
+                    - label:
+                        id: lbl_floor_lazienka_temp
+                        x: 500
+                        y: 110
+                        text: "-.-°C"
+                        text_font: montserrat_14
+                        text_color: 0xFFFFFF
+                    - label:
+                        id: lbl_floor_sypialnia_temp
+                        x: 450
+                        y: 165
+                        text: "-.-°C"
+                        text_font: montserrat_14
+                        text_color: 0xFFFFFF
+
+              # (0,1) ZEWNĄTRZ (temp + wilgotność)
               - obj:
                   styles: tile_style
                   grid_cell_column_pos: 0
                   grid_cell_column_span: 1
-                  grid_cell_row_pos: 0
+                  grid_cell_row_pos: 1
                   grid_cell_row_span: 1
                   widgets:
                     - label:
                         styles: tile_title
-                        text: "POGODA"
-                        align: TOP_LEFT
-                    - label:
-                        id: lbl_weather_state
-                        styles: tile_value
-                        text: "-"
-                        align: LEFT_MID
-
-              # (1,0) NA ZEWNĄTRZ
-              - obj:
-                  styles: tile_style
-                  grid_cell_column_pos: 1
-                  grid_cell_column_span: 1
-                  grid_cell_row_pos: 0
-                  grid_cell_row_span: 1
-                  widgets:
-                    - label:
-                        styles: tile_title
-                        text: "NA ZEWNĄTRZ"
+                        text: "ZEWNĄTRZ"
                         align: TOP_LEFT
                     - label:
                         id: lbl_outside_temp
                         styles: tile_value
                         text: "-.-°C"
-                        align: LEFT_MID
-
-              # (0,1) TEMP. W DOMU (średnia)
-              - obj:
-                  styles: tile_style
-                  grid_cell_column_pos: 0
-                  grid_cell_column_span: 1
-                  grid_cell_row_pos: 1
-                  grid_cell_row_span: 1
-                  widgets:
-                    - label:
-                        styles: tile_title
-                        text: "TEMP. W DOMU"
                         align: TOP_LEFT
+                        y: 30
                     - label:
-                        id: lbl_indoor_mean
-                        styles: tile_value
-                        text: "-.-°C"
-                        align: LEFT_MID
+                        id: lbl_outside_humidity
+                        text: "-- %"
+                        align: BOTTOM_LEFT
+                        text_font: montserrat_12
+                        text_color: 0xCCCCCC
 
-              # (1,1) SALON
+              # (1,1) SYPIALNIA (temp + wilg. + ciśnienie)
               - obj:
                   styles: tile_style
                   grid_cell_column_pos: 1
                   grid_cell_column_span: 1
                   grid_cell_row_pos: 1
-                  grid_cell_row_span: 1
-                  widgets:
-                    - label:
-                        styles: tile_title
-                        text: "SALON"
-                        align: TOP_LEFT
-                    - label:
-                        id: lbl_salon_temp
-                        styles: tile_value
-                        text: "-.-°C"
-                        align: LEFT_MID
-
-              # (0,2) SYPIALNIA (mały pokój)
-              - obj:
-                  styles: tile_style
-                  grid_cell_column_pos: 0
-                  grid_cell_column_span: 1
-                  grid_cell_row_pos: 2
                   grid_cell_row_span: 1
                   widgets:
                     - label:
@@ -1401,9 +1796,48 @@ lvgl:
                         id: lbl_sypialnia_temp
                         styles: tile_value
                         text: "-.-°C"
-                        align: LEFT_MID
+                        align: TOP_LEFT
+                        y: 30
+                    - label:
+                        id: lbl_sypialnia_humidity
+                        text: "-- %"
+                        align: BOTTOM_LEFT
+                        text_font: montserrat_12
+                        text_color: 0xCCCCCC
+                    - label:
+                        id: lbl_sypialnia_pressure
+                        text: "---- hPa"
+                        align: BOTTOM_LEFT
+                        y: -18
+                        text_font: montserrat_12
+                        text_color: 0xCCCCCC
 
-              # (1,2) ŁAZIENKA
+              # (0,2) SALON (temp + wilgotność)
+              - obj:
+                  styles: tile_style
+                  grid_cell_column_pos: 0
+                  grid_cell_column_span: 1
+                  grid_cell_row_pos: 2
+                  grid_cell_row_span: 1
+                  widgets:
+                    - label:
+                        styles: tile_title
+                        text: "SALON"
+                        align: TOP_LEFT
+                    - label:
+                        id: lbl_salon_temp
+                        styles: tile_value
+                        text: "-.-°C"
+                        align: TOP_LEFT
+                        y: 30
+                    - label:
+                        id: lbl_salon_humidity
+                        text: "-- %"
+                        align: BOTTOM_LEFT
+                        text_font: montserrat_12
+                        text_color: 0xCCCCCC
+
+              # (1,2) SALON BT (temp + wilgotność)
               - obj:
                   styles: tile_style
                   grid_cell_column_pos: 1
@@ -1413,15 +1847,22 @@ lvgl:
                   widgets:
                     - label:
                         styles: tile_title
-                        text: "ŁAZIENKA"
+                        text: "SALON BT"
                         align: TOP_LEFT
                     - label:
-                        id: lbl_lazienka_temp
+                        id: lbl_salon_bt_temp
                         styles: tile_value
                         text: "-.-°C"
-                        align: LEFT_MID
+                        align: TOP_LEFT
+                        y: 30
+                    - label:
+                        id: lbl_salon_bt_humidity
+                        text: "-- %"
+                        align: BOTTOM_LEFT
+                        text_font: montserrat_12
+                        text_color: 0xCCCCCC
 
-              # (0,3) DRZWI WEJŚCIOWE
+              # (0,3) POGODA + WEWNĄTRZ
               - obj:
                   styles: tile_style
                   grid_cell_column_pos: 0
@@ -1431,15 +1872,27 @@ lvgl:
                   widgets:
                     - label:
                         styles: tile_title
-                        text: "DRZWI WEJŚCIOWE"
+                        text: "POGODA"
                         align: TOP_LEFT
                     - label:
-                        id: lbl_drzwi_wejsciowe
+                        id: lbl_weather_state
                         styles: tile_value
                         text: "-"
-                        align: LEFT_MID
+                        align: TOP_LEFT
+                        y: 30
+                    - label:
+                        styles: tile_title
+                        text: "WEWNĄTRZ"
+                        align: BOTTOM_LEFT
+                    - label:
+                        id: lbl_indoor_mean
+                        text: "-.-°C"
+                        align: BOTTOM_LEFT
+                        y: -18
+                        text_font: montserrat_12
+                        text_color: 0xCCCCCC
 
-              # (1,3) OKNO KUCHNIA 1
+              # (1,3) KALENDARZ
               - obj:
                   styles: tile_style
                   grid_cell_column_pos: 1
@@ -1449,93 +1902,14 @@ lvgl:
                   widgets:
                     - label:
                         styles: tile_title
-                        text: "OKNO KUCHNIA 1"
-                        align: TOP_LEFT
-                    - label:
-                        id: lbl_okno_kuchnia_1
-                        styles: tile_value
-                        text: "-"
-                        align: LEFT_MID
-
-              # (0,4) BACKLIGHT (slider) – zamiast osobnego panelu
-              - obj:
-                  styles: tile_style
-                  grid_cell_column_pos: 0
-                  grid_cell_column_span: 1
-                  grid_cell_row_pos: 4
-                  grid_cell_row_span: 1
-                  widgets:
-                    - label:
-                        id: brightness_label
-                        styles: tile_title
-                        text: "Backlight: 100%"
-                        align: TOP_LEFT
-
-                    - slider:
-                        id: brightness_slider
-                        x: 0
-                        y: 55
-                        width: 100%
-                        height: 50
-                        min_value: 5
-                        max_value: 100
-                        value: 100
-                        on_value:
-                          then:
-                            - script.execute: wake_display
-                            - light.turn_on:
-                                id: backlight
-                                brightness: !lambda return x / 100.0;
-                            - lvgl.label.update:
-                                id: brightness_label
-                                text: !lambda |-
-                                  static char s[32];
-                                  int b = (int)x;
-                                  if (b < 0) b = 0;
-                                  if (b > 100) b = 100;
-                                  snprintf(s, sizeof(s), "Backlight: %d%%", b);
-                                  return s;
-
-              # (1,4) NEWS (przejście na Twoją stronę)
-              - obj:
-                  styles: tile_style
-                  grid_cell_column_pos: 1
-                  grid_cell_column_span: 1
-                  grid_cell_row_pos: 4
-                  grid_cell_row_span: 1
-                  clickable: true
-                  on_click:
-                    - script.execute: wake_display
-                  widgets:
-                    - label:
-                        styles: tile_title
-                        text: "NEWS"
-                        align: TOP_LEFT
-                    - label:
-                        styles: tile_value
-                        text_color: 0x6495ED
-                        text: ">"
-                        align: RIGHT_MID
-                        x: -10
-
-              # (0,5) AGENDA (skrót) – jeśli chcesz; inaczej usuń cały kafel
-              - obj:
-                  styles: tile_style
-                  grid_cell_column_pos: 0
-                  grid_cell_column_span: 2
-                  grid_cell_row_pos: 5
-                  grid_cell_row_span: 1
-                  widgets:
-                    - label:
-                        styles: tile_title
-                        text: "AGENDA"
+                        text: "KALENDARZ"
                         align: TOP_LEFT
                     - textarea:
                         id: lbl_calendar_event
                         x: 0
                         y: 35
-                        width: 720
-                        height: 120
+                        width: 340
+                        height: 140
                         one_line: false
                         text: "Loading..."
                         text_font: montserrat_12
@@ -1704,6 +2078,27 @@ interval:
             const float v = id(batt_v).state;
             if (isnan(v)) snprintf(s, sizeof(s), "--.-- V");
             else snprintf(s, sizeof(s), "%.2f V", v);
+            return s;
+
+      # Backlight % label + modal value
+      - lvgl.label.update:
+          id: lbl_backlight_percent
+          text: !lambda |-
+            static char s[16];
+            const bool on = id(backlight).current_values.is_on();
+            const float b = id(backlight).current_values.get_brightness();
+            const int pct = on ? (int) (b * 100.0f + 0.5f) : 0;
+            snprintf(s, sizeof(s), "%d %%", pct);
+            return s;
+
+      - lvgl.label.update:
+          id: lbl_backlight_modal_percent
+          text: !lambda |-
+            static char s[32];
+            const bool on = id(backlight).current_values.is_on();
+            const float b = id(backlight).current_values.get_brightness();
+            const int pct = on ? (int) (b * 100.0f + 0.5f) : 0;
+            snprintf(s, sizeof(s), "Brightness: %d %%", pct);
             return s;
 
   - interval: 10min
