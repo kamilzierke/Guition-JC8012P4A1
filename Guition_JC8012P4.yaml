@@ -686,6 +686,15 @@ font:
     size: 10
 
   - file: "fonts/materialdesignicons-webfont.ttf"
+    id: icons_16
+    size: 16
+    bpp: 4
+    glyphs: [
+      "\U000F0091",
+      "\U000F05A9",
+    ]
+
+  - file: "fonts/materialdesignicons-webfont.ttf"
     id: icons_20
     size: 20
     bpp: 4
@@ -1027,7 +1036,7 @@ lvgl:
                 text: "\U000F05A9"
                 hidden: true
                 align: CENTER
-                text_font: icons_20
+                text_font: icons_16
                 styles: top_layer_style
 
       # Battery % label
@@ -1057,7 +1066,7 @@ lvgl:
             - label:
                 id: lbl_battery_status
                 align: CENTER
-                text_font: icons_20
+                text_font: icons_16
                 text: "\U000F0091"
                 styles: top_layer_style
 
