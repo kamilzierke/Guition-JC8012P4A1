@@ -1277,9 +1277,9 @@ lvgl:
       - obj:
           align: TOP_RIGHT
           x: -150
-          y: 7
+          y: 4
           width: 44
-          height: 30
+          height: 36
           bg_opa: TRANSP
           border_width: 0
           clickable: true
@@ -1309,9 +1309,9 @@ lvgl:
       - obj:
           align: TOP_RIGHT
           x: -10
-          y: 7
+          y: 4
           width: 44
-          height: 30
+          height: 36
           bg_opa: TRANSP
           border_width: 0
           clickable: true
